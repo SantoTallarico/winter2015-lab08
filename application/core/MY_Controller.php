@@ -31,7 +31,8 @@ class Application extends CI_Controller {
      * Render this page
      */
     function render() {
-        $this->data['menubar'] = $this->parser->parse('_menubar', $this->config->item('menu_choices'),true);
+        //$this->data['menubar'] = $this->parser->parse('_menubar', $this->config->item('menu_choices'),true);
+        $this->makemenu();
         $this->data['content'] = $this->parser->parse($this->data['pagebody'], $this->data, true);
 
         // finally, build the browser page!
@@ -53,6 +54,34 @@ class Application extends CI_Controller {
                 return;
             }
         }
+    }
+    
+    function makemenu() {
+        $userRole = $this->session->userdata('userRole');
+        $userName = $this->session->userdata('userName');
+        $this->data['menudata'] = array();
+        array_push($this->data['menudata'], array('name' => "Alpha",
+                                                    'link' => '/alpha'));
+        if ($userRole === "user") {
+            array_push($this->data['menudata'], array('name' => "Beta", 
+                                                        'link' => '/beta'));
+        } else if ($userRole === "admin") {
+            array_push($this->data['menudata'], array('name' => "Beta", 
+                                                        'link' => '/beta'));
+            array_push($this->data['menudata'], array('name' => "Gamma", 
+                                                        'link' => '/gamma'));
+        }        
+        if (!empty($userName)) {
+            $this->data['uname'] = $userName;
+            array_push($this->data['menudata'], array('name' => "Logout", 
+                                                        'link' => '/auth/logout'));
+        } else {
+            $this->data['uname'] = "";
+            array_push($this->data['menudata'], array('name' => "Login", 
+                                                        'link' => '/auth'));
+        }
+        
+        $this->data['menubar'] = $this->parser->parse('_menubar', $this->data,true);
     }
 }
 
